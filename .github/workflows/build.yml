@@ -34,28 +34,32 @@ jobs:
         username: ${{ secrets.GHCR_USERNAME }}
         password: ${{ secrets.GHCR_TOKEN }}
 
-    - name: Build image (multiarch) with cache export
-      id: build-image
+    # STEP 1: build tylko dla amd64, lokalnie
+    - name: Build local amd64 image for Trivy scan
       uses: docker/build-push-action@v5
       with:
         context: .
         push: false
-        platforms: linux/amd64,linux/arm64
-        tags: ghcr.io/${{ secrets.GHCR_USERNAME }}/weather-app:latest
+        platforms: linux/amd64
+        tags: weather-app:test
+        load: true
         cache-from: type=registry,ref=doman782/weather-app-cache
         cache-to: type=registry,ref=doman782/weather-app-cache,mode=max
 
-    - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@0.30.0
-      with:
-        image-ref: ghcr.io/${{ secrets.GHCR_USERNAME }}/weather-app:latest
-        format: table
-        ignore-unfixed: true
-        vuln-type: os,library
-        severity: CRITICAL,HIGH
-        exit-code: 1
+    # STEP 2: Trivy lokalnie (docker run)
+    - name: Run Trivy vulnerability scanner locally
+      run: |
+        docker run --rm \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          aquasec/trivy:0.50.1 image \
+          --severity CRITICAL,HIGH \
+          --ignore-unfixed \
+          --format table \
+          --vuln-type os,library \
+          --exit-code 1 \
+          weather-app:test
 
-
+    # STEP 3: jeśli Trivy OK buduj multiarch i wypchnij
     - name: Push image to GHCR if scan passes
       if: success()
       uses: docker/build-push-action@v5
