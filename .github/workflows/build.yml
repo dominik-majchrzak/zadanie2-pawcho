@@ -44,7 +44,6 @@ jobs:
         tags: ghcr.io/${{ secrets.GHCR_USERNAME }}/weather-app:latest
         cache-from: type=registry,ref=doman782/weather-app-cache
         cache-to: type=registry,ref=doman782/weather-app-cache,mode=max
-        outputs: type=docker
 
     - name: Run Trivy vulnerability scanner
       uses: aquasecurity/trivy-action@0.30.0
