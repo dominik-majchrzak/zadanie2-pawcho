@@ -47,14 +47,14 @@ jobs:
         outputs: type=docker
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.30.0
+      uses: aquasecurity/trivy-action@0.30.0
       with:
         image-ref: ghcr.io/${{ secrets.GHCR_USERNAME }}/weather-app:latest
         format: table
         ignore-unfixed: true
         vuln-type: os,library
         severity: CRITICAL,HIGH
-        exit-code: 1
+      exit-code: 1
 
 
     - name: Push image to GHCR if scan passes
