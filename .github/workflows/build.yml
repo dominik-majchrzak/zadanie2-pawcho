@@ -47,7 +47,7 @@ jobs:
         outputs: type=docker
 
     - name: Run Trivy vulnerability scanner
-      uses: aquasecurity/trivy-action@v0.11.2
+      uses: aquaproj/trivy-action@v0.12.0
       id: scan
       with:
         image-ref: ghcr.io/${{ secrets.GHCR_USERNAME }}/weather-app:latest
